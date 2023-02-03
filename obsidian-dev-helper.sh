@@ -199,6 +199,7 @@ fi
 
 # Worker: Watcher
 ({
+	trap 'exit 1' INT
 	while true; do
 		entr -npz true <<-FILES
 			${PLUGIN_MANIFEST_FILE}
