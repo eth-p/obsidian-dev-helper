@@ -39,6 +39,11 @@
 # .IP "--help"
 # Prints this help page and exits.
 #
+# .SH CAVEATS
+# On MacOS systems, Obsidian will steal the window focus whenever it receives
+# an "obsidian:" URL event. You may wish to use \fB--no-auto-reload\fP on these
+# systems.
+#
 # ------------------------------------------------------------------------------
 set -euo pipefail
 errorexit() { printf "\x1B[31merror: ${1}\x1B[0m\n" "${@:2}"; exit 1; }
@@ -201,7 +206,7 @@ fi
 			${PLUGIN_STYLE_FILE}
 		FILES
 
-		debounce "$ARG_BUILD_DEBOUNCE" install_plugin
+		debounce "$ARG_BUILD_DEBOUNCE" install_plugin || true
 	done
 }) &
 pids+=($!)
