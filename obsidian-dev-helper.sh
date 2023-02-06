@@ -36,6 +36,11 @@
 # built. This is intended to prevent the plugin from being installed while it
 # is still building.
 #
+# .IP "--build-directory \fIdirectory\fP"
+# Specify the build's output directory. This is where the \fBmain.js\fP,
+# \fBstyles.css\fP, and \fBmanifest.json\fP files are located.
+# Defaults to the current directory.
+#
 # .IP "--help"
 # Prints this help page and exits.
 #
@@ -176,18 +181,16 @@ install_helper() {
 ARG_DESTINATION_VAULT=""
 ARG_BUILD_COMMAND="npm run dev"
 ARG_BUILD_DEBOUNCE=1
+ARG_BUILD_OUTDIR="."
 ARG_AUTO_RELOAD=true
 
-PLUGIN_MANIFEST_FILE="manifest.json"
-PLUGIN_SCRIPT_FILE="main.js"
-PLUGIN_STYLE_FILE="styles.css"
-
 while [ $# -gt 0 ]; do case "$1" in
-	--build-command)  ARG_BUILD_COMMAND="$2";     shift; shift;;
-	--build-delay)    ARG_BUILD_DEBOUNCE="$2";    shift; shift;;
-	--vault)          ARG_DESTINATION_VAULT="$2"; shift; shift;;
-	--auto-reload)    ARG_AUTO_RELOAD=true;       shift;;
-	--no-auto-reload) ARG_AUTO_RELOAD=false;      shift;;
+	--build-command)   ARG_BUILD_COMMAND="$2";     shift; shift;;
+	--build-delay)     ARG_BUILD_DEBOUNCE="$2";    shift; shift;;
+	--build-directory) ARG_BUILD_OUTDIR="$2";      shift; shift;;
+	--vault)           ARG_DESTINATION_VAULT="$2"; shift; shift;;
+	--auto-reload)     ARG_AUTO_RELOAD=true;       shift;;
+	--no-auto-reload)  ARG_AUTO_RELOAD=false;      shift;;
 	--help) {
 			grep "^# " < "$0" \
 				| awk '/^# -----/{p=p+1;next}{if(p==1){print}}' \
@@ -199,6 +202,10 @@ while [ $# -gt 0 ]; do case "$1" in
 	*) printf "\x1B[31merror: unknown argument: %s\x1B[0m\n" "$1"; exit;;
 esac; done
 
+PLUGIN_MANIFEST_FILE="${ARG_BUILD_OUTDIR}/manifest.json"
+PLUGIN_SCRIPT_FILE="${ARG_BUILD_OUTDIR}/main.js"
+PLUGIN_STYLE_FILE="${ARG_BUILD_OUTDIR}/styles.css"
+
 # Validate arguments.
 if [ -z "$ARG_DESTINATION_VAULT" ]; then
  	errorexit "argument '--vault' is required"
@@ -209,9 +216,7 @@ if ! [ -d "${ARG_DESTINATION_VAULT}/.obsidian" ]; then
 fi
 
 # Install the helper.
-if "$ARG_AUTO_RELOAD"; then
-	install_helper
-fi
+install_helper
 
 # Worker: Watcher
 ({
