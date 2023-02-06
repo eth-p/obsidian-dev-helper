@@ -140,14 +140,30 @@ install_helper() {
 		module.exports = {
 			__esModule: true,
 			default: class extends obsidian.Plugin {
+				doReloadPlugin(id) {
+					this.app.plugins.disablePlugin(id);
+					this.app.plugins.enablePlugin(id);
+				}
+				
 				onload() {
+					// Protocol handler.
 					this.registerObsidianProtocolHandler("devtool-reload", (args) => {
 						if ('plugin' in args) {
-							this.app.plugins.disablePlugin(args.plugin);
-							this.app.plugins.enablePlugin(args.plugin);
+							this.doReloadPlugin(args.plugin);
 							console.log("Requested to reload plugin:", args.plugin);
 						}
 					})
+
+					// Commands for hotkeys.
+					for (const plugin of Object.values(this.app.plugins.manifests)) {
+						this.addCommand({
+							id: `reload-plugin-${plugin.id}`,
+							name: `Reload Plugin: ${plugin.name}`,
+							callback: () => {
+								this.doReloadPlugin(plugin.id);
+							}
+						});
+					}
 				}
 			}
 		}
