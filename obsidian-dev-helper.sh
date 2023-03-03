@@ -41,6 +41,10 @@
 # \fBstyles.css\fP, and \fBmanifest.json\fP files are located.
 # Defaults to the current directory.
 #
+# .IP "--plugin-manifest \fIfile\fP"
+# Specify the plugin manifest file.
+# Defaults to \fBmanifest.json\fP inside the build directory.
+#
 # .IP "--help"
 # Prints this help page and exits.
 #
@@ -188,6 +192,7 @@ while [ $# -gt 0 ]; do case "$1" in
 	--build-command)   ARG_BUILD_COMMAND="$2";     shift; shift;;
 	--build-delay)     ARG_BUILD_DEBOUNCE="$2";    shift; shift;;
 	--build-directory) ARG_BUILD_OUTDIR="$2";      shift; shift;;
+	--plugin-manifest) ARG_PLUGIN_MANIFEST="$2";   shift; shift;;
 	--vault)           ARG_DESTINATION_VAULT="$2"; shift; shift;;
 	--auto-reload)     ARG_AUTO_RELOAD=true;       shift;;
 	--no-auto-reload)  ARG_AUTO_RELOAD=false;      shift;;
@@ -205,6 +210,10 @@ esac; done
 PLUGIN_MANIFEST_FILE="${ARG_BUILD_OUTDIR}/manifest.json"
 PLUGIN_SCRIPT_FILE="${ARG_BUILD_OUTDIR}/main.js"
 PLUGIN_STYLE_FILE="${ARG_BUILD_OUTDIR}/styles.css"
+
+if [ -n "$ARG_PLUGIN_MANIFEST" ]; then
+	PLUGIN_MANIFEST_FILE="$ARG_PLUGIN_MANIFEST"
+fi
 
 # Validate arguments.
 if [ -z "$ARG_DESTINATION_VAULT" ]; then
